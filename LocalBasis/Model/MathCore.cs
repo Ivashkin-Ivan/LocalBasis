@@ -14,7 +14,7 @@ namespace LocalBasis.Model
             // Получим из отрезка начало(конец) и направляющий вектор
             XYZ vector = foundation.Direction;
             XYZ origin = foundation.Origin;
-            FamilyInstance cube = new FilteredElementCollector(document) //Нужно создвать экземпляр куба
+            FamilyInstance cube = new FilteredElementCollector(document) //Нужно создвать экземпляр куба => нужно добавить проверку isActivate
                                       .OfClass(typeof(FamilyInstance))
                                       .Cast<FamilyInstance>()
                                       .Last(it => it.Symbol.FamilyName == "RedCube" && it.Symbol.Name == "Красный");
@@ -25,12 +25,10 @@ namespace LocalBasis.Model
             if (vector.X > 0)
             {
                 angle = 2 * Math.PI - vector.AngleTo(facingOrientation); //Угол между направляющим вектором и FacingOrientation
-                //angle2 = 2 * Math.PI - fo.AngleTo(vector); //Угол между направляющим и FacingOrientation
             }
             else
             {
-                angle = vector.AngleTo(facingOrientation); //Угол между направляющим вектором и FacingOrientation
-                //angle2 = fo.AngleTo(vector); //Угол между направляющим и FacingOrientation
+                angle = vector.AngleTo(facingOrientation); //Угол между направляющим вектором и FacingOrientation  
             }
             Line rotationAxis = Line.CreateBound(origin, origin + new XYZ(0, 0, 1));
 
@@ -47,8 +45,9 @@ namespace LocalBasis.Model
             Instance instance = cube as Instance;
             Transform transform = instance.GetTotalTransform();       // Матрица
             Transform inverse = instance.GetTotalTransform().Inverse; //Обратная матрица - сохраняю эту строку для понятности
-            //====================================================
-            
+                                                                      //====================================================
+            document.Delete(cube.Id); //Система готова, куб больше не нужен
+
             return transform; //Хранит информацию о новой систме координат
         }
         public static Transform CreateLocalCoordinateSystem(Instance instance, Document document)

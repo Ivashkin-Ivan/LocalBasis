@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using Autodesk.Revit.UI;
 using LocalBasis.Model;
+using LocalBasis.View;
 
 namespace LocalBasis.ExternalCommand
 {
@@ -24,6 +25,21 @@ namespace LocalBasis.ExternalCommand
             using (Transaction transaction = new Transaction(doc))
             {
                 transaction.Start("Safety transaction");
+
+                //1) Имеется ревит с элементами,
+                //2) Размещаю куб (зашить isAcivae в MathCore)
+                //3) Выделяю элементы рамкой, ставлю ElementFilter, чтобы выбрал только asLine и asInstance
+                //4) В цикле создаю для них CustomVector и CustomInstance
+                //5) В цикле генерирую для них системы координат
+                //6) Беру элемент, тяну view inst or vect в зависимости от выбранного элемента
+                //7) В VM передаю выбранный элемент (таскаю элемент, жму Track, на выход получаю таблицу координат
+                //8) Пишу в Custom-ах метод, который генрирует таблицу Basis + Origin
+
+
+
+
+
+
 
 
 
@@ -153,6 +169,9 @@ namespace LocalBasis.ExternalCommand
                 var foundation = (duct.Location as LocationCurve).Curve as Line;
               
                 var newCoord = MathCore.CreateLocalCoordinateSystem(foundation, doc);
+
+                var ui = new InstanceView();
+                    ui.Show();
 
                 
 

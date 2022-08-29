@@ -6,7 +6,9 @@ using System.Threading.Tasks;
 
 namespace LocalBasis.Model
 {
-    public class LocalBasis
+    internal class CustomLine
     {
+
+
     }
 }

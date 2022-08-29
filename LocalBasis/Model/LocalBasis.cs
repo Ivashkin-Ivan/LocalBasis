@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace LocalBasis.Model
 {
-    internal class Class1
+    public class LocalBasis
     {
     }
 }

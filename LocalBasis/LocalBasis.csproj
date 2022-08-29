@@ -31,6 +31,18 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="RevitAPI">
+      <HintPath>..\..\..\..\..\..\Program Files\Autodesk\Revit 2021\RevitAPI.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="RevitAPIUI">
+      <HintPath>..\..\..\..\..\..\Program Files\Autodesk\Revit 2021\RevitAPIUI.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="RevitUIAPI">
+      <HintPath>..\..\..\..\..\..\Program Files\Autodesk\Revit 2021\RevitUIAPI.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -41,9 +53,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Command\Class1.cs" />
-    <Compile Include="ExternalCommand\Class1.cs" />
-    <Compile Include="Model\Class1.cs" />
+    <Compile Include="ExternalCommand\Command.cs" />
+    <Compile Include="Model\LocalBasis.cs" />
+    <Compile Include="Model\MathCore.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ViewModel\Class1.cs" />
     <Compile Include="View\Class1.cs" />

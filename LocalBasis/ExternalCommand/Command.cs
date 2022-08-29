@@ -25,13 +25,19 @@ namespace LocalBasis.ExternalCommand
             {
                 transaction.Start("Safety transaction");
 
- 
+
+
+
+            // Очень важный код, разработака пересчёта Basis-а + тестовый id из документа стены
+
+            #region
+
             FamilyInstance cube = new FilteredElementCollector(doc).OfClass(typeof(FamilyInstance))
                                                                    .Cast<FamilyInstance>()
                                                                    .Last(it => it.Symbol.FamilyName == "RedCube" && it.Symbol.Name == "Красный");
 
             Element duct = new FilteredElementCollector(doc).OfClass(typeof(Duct)).Cast<Duct>().First() as Element;
-            #region
+           
             //var angle = Math.PI / 4; // Угол, на который будет происходить поворот
 
             //Transform transform1 = Transform.CreateRotation(XYZ.BasisZ, angle);
@@ -44,7 +50,7 @@ namespace LocalBasis.ExternalCommand
             //Transform compose2 = transform2 * transform1;
 
             // Трансформ в минус первой стпени
-            #endregion
+       
 
             //Трубы для проверки пересчёта
             Element duct1 = doc.GetElement(new ElementId(287225));
@@ -135,9 +141,10 @@ namespace LocalBasis.ExternalCommand
 
                 var cube2NewOrigin = inverse.OfPoint(cube2Origin);          // origin через Locaion из общего в локальный
                 var cube2ReturnOrigin = transform.OfPoint(cube2NewOrigin);  // origin через Locaion из локального в общий                                                                              
-                //====================================================
+                                                                            //====================================================
 
 
+                #endregion
 
 
 
@@ -154,6 +161,11 @@ namespace LocalBasis.ExternalCommand
 
 
               
+
+
+
+
+
 
 
 

@@ -4,9 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace LocalBasis.View
+namespace LocalBasis.ViewModel
 {
-    internal class Class1
+    public class VectorViewModel
     {
+
     }
 }

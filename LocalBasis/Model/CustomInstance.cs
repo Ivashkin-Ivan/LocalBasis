@@ -14,6 +14,8 @@ namespace LocalBasis.Model
         public XYZ GlobalBasisY { get; set; }
         public XYZ GlobalBasisZ { get; set; }
         public XYZ GlobalOrigin { get; set; }
+        //Для вывода
+        public string GlobalText = "привет";
 
         //Локальная система координат
         public Transform LocalCoordinateSystem { get; set; }
@@ -23,12 +25,15 @@ namespace LocalBasis.Model
         public XYZ LocalBasisY { get; set; }
         public XYZ LocalBasisZ { get; set; }
         public XYZ LocalOrigin { get; set; }
-
+        //Для вывода
+        public string LocalText;
 
         public CustomInstance(Element element)
         {
             Element = element;
             Instance = (Element as Instance);
+            SetNewGlobalCoords();
+            SetNewLocalCoords();
         }
         public void SetNewGlobalCoords()
         {
@@ -37,6 +42,11 @@ namespace LocalBasis.Model
             GlobalBasisY = transform.BasisY;
             GlobalBasisZ = transform.BasisZ;
             GlobalOrigin = transform.Origin;
+            if (GlobalText == "привет")
+                GlobalText = "пока";
+            if (GlobalText == "пока")
+                GlobalText = "привет";
+
         }
         public void SetNewLocalCoords()
         {

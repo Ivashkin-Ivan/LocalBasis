@@ -11,6 +11,7 @@ using System.Windows;
 using Autodesk.Revit.UI;
 using LocalBasis.Model;
 using LocalBasis.View;
+using LocalBasis.ViewModel;
 
 namespace LocalBasis.ExternalCommand
 {
@@ -35,7 +36,7 @@ namespace LocalBasis.ExternalCommand
                 //7) В VM передаю выбранный элемент (таскаю элемент, жму Track, на выход получаю таблицу координат
                 //8) Пишу в Custom-ах метод, который генрирует таблицу Basis + GlobalOrigin
 
-                var element = doc.GetElement(new ElementId(288349)); //Элемент который будет трэкать
+
 
 
 
@@ -171,10 +172,23 @@ namespace LocalBasis.ExternalCommand
                 //Test MathCore
 
                 //var foundation = (duct.Location as LocationCurve).Curve as Line;
-              
+
                 //var newCoord = MathCore.CreateLocalCoordinateSystem(foundation, doc);
 
+
+                var element = doc.GetElement(new ElementId(288349)); //Элемент который будет трэкать
+                var model = new CustomInstance(element);
+
+
+
+                var vm = new InstanceViewModel();
+                
+                vm.CustomInstance = model;
+                vm.GlobalText = model.GlobalText;
+                vm.LocalText = model.LocalText;
+
                 var ui = new InstanceView();
+                ui.DataContext = vm;
                     ui.Show();
 
                 

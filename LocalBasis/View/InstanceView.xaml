@@ -3,9 +3,12 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:LocalBasis.View"
+             xmlns:local="clr-namespace:LocalBasis.ViewModel"
              mc:Ignorable="d" 
              Height="400" Width="600" ResizeMode="NoResize">
+    <Window.DataContext>
+        <local:InstanceViewModel/>
+    </Window.DataContext>
     <Grid>
         <Grid/>
         <TextBlock Text=" Для получения координат элемента нажмите Track:"
@@ -15,11 +18,13 @@
                 HorizontalAlignment="Right"
                 Content="Track" 
                 Margin="0,8,25,0" 
-                Width="65"/>
+                Width="65"
+                Command="{Binding TrackCommand}"/>
         <TextBlock x:Name="Global"
                     Margin="10,33,25,142"  
                     Padding="10,10,10,10"
-                    Background="AliceBlue"/>
+                    Background="AliceBlue"
+                    Text="{Binding GlobalText}"/>
         <ScrollViewer Margin="10,154,10,10">
             <TextBlock x:Name="Locals" 
                        Margin="0,0,0,0"  

@@ -39,7 +39,7 @@ namespace LocalBasis.ViewModel
             }
             set
             {
-               globalText = value;
+               localText = value;
                OnPropertyChanged("LocalText");
             }
         }

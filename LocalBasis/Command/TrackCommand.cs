@@ -14,13 +14,14 @@ namespace LocalBasis.Command
         public event EventHandler CanExecuteChanged;
 
         private InstanceViewModel InstanceViewModel;
-        private VectorViewModel VectorViewModel;
         public TrackCommand(InstanceViewModel instanceViewModel) //пока сделаем только от инстанца
         {
             InstanceViewModel = instanceViewModel;
         }
-        public bool CanExecute(object parameter) => true;
-        
+        public bool CanExecute(object parameter)
+        {
+            return true;
+        }
         public void Execute(object parameter)
         {
             InstanceViewModel.CustomInstance.SetNewGlobalCoords();

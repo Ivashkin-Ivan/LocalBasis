@@ -190,7 +190,7 @@ namespace LocalBasis.ExternalCommand
 
                 var ui = new InstanceView();
                 ui.DataContext = vm;
-                    ui.Show();
+                ui.ShowDialog();
 
 
 

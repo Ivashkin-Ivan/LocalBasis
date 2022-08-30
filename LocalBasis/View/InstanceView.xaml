@@ -13,7 +13,7 @@
         <Grid/>
         <TextBlock Text=" Для получения координат элемента нажмите Track:"
                    Background="LightGoldenrodYellow" Margin="10,10,100,256"/>
-        <Button x:Name="BTN_Save" 
+        <Button x:Name="Track" 
                 VerticalAlignment="Top" 
                 HorizontalAlignment="Right"
                 Content="Track" 

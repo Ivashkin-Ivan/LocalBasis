@@ -19,7 +19,7 @@ namespace LocalBasis.Model
         public XYZ GlobalBasisZ { get; set; }
         public XYZ GlobalOrigin { get; set; }
         //Для вывода
-        private string globalText = "привет";
+        private string globalText;
         public string GlobalText
         {
             get
@@ -62,8 +62,6 @@ namespace LocalBasis.Model
             GlobalBasisY = transform.BasisY;
             GlobalBasisZ = transform.BasisZ;
             GlobalOrigin = transform.Origin;
-            i++;
-            GlobalText = i.ToString();
         }
         public void SetNewLocalCoords()
         {
@@ -72,6 +70,38 @@ namespace LocalBasis.Model
             LocalBasisY = inLocal.BasisY;
             LocalBasisZ = inLocal.BasisZ;
             LocalOrigin = inLocal.Origin;
+        }
+        public void CreateNewTable()
+        {
+            SetNewGlobalCoords();
+            SetNewLocalCoords();
+
+            GlobalText = null;
+            //Таблица в главной системе======================================
+            GlobalText += "Координаты instance Revit"+"\r\n\n";
+
+            GlobalText += "Матрица направляющих cos-ов" + "\r\n";
+            GlobalText += GlobalBasisX.ToString() + "\r\n";
+            GlobalText += GlobalBasisY.ToString() + "\r\n";
+            GlobalText += GlobalBasisZ.ToString() + "\r\n\n";
+
+            GlobalText += "Координаты точки размещения" + "\r\n";
+            GlobalText += GlobalOrigin.ToString() + "\r\n";
+            //===============================================================
+
+
+            LocalText = null;
+            //Таблица в локальной системе====================================
+            LocalText += "Координаты instance Местная система" + "\r\n\n";
+
+            LocalText += "Матрица направляющих cos-ов" + "\r\n";
+            LocalText += LocalBasisX.ToString() + "\r\n";
+            LocalText += LocalBasisY.ToString() + "\r\n";
+            LocalText += LocalBasisZ.ToString() + "\r\n\n";
+
+            LocalText += "Координаты точки размещения" + "\r\n";
+            LocalText += LocalOrigin.ToString() + "\r\n";
+            //==============================================================
         }
         public void OnPropertyChanged([CallerMemberName] string prop = "")
         {

@@ -25,8 +25,9 @@ namespace LocalBasis.Command
         }
         public void Execute(object parameter)
         {
-            ViewModel.CustomInstance.SetNewGlobalCoords();
+            ViewModel.CustomInstance.CreateNewTable();
             ViewModel.GlobalText = ViewModel.CustomInstance.GlobalText;
+            ViewModel.LocalText = ViewModel.CustomInstance.LocalText;
             return;
         }
     }

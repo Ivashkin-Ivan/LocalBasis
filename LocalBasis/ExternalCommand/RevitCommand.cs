@@ -187,7 +187,7 @@ namespace LocalBasis.ExternalCommand
                 vm.CustomInstance = model;
                 var ui = new InstanceView();
                 ui.DataContext = vm;
-                ui.ShowDialog();
+                ui.Show();
 
 
 

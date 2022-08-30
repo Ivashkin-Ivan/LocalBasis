@@ -69,17 +69,17 @@ namespace LocalBasis.Model
 
             return line;
         }
-        public static Instance FromGlobalToLocal(Transform localCoordinateSystem, Instance instance)
+        public static Transform FromGlobalToLocal(Transform localCoordinateSystem, Instance instance) // Прийдётся возвращать трансформ
         {
-            // Так как Revit матрица считается кватрнионной и работает в R^4, а размерность локального базиса R^3, то линейная комбинация последнего столбца Origin работает некорректно
-            // в произвдении матриц, приходится вручную брать метод OfPoint и переписывать данный столбец дополнитльным действием. В debug-е BasisX, BasisY, BasisZ
-            // можно рассматривать как матрицу 3х3, а строку Origin представлять как столбец приписанный к этой матрице справа, 4 строка заполняется нулями, в месте (4;4) стоит единица
+            // Так как Revit матрица считается кватрнионной и работает в R^4, а размерность локального базиса R^3, то линейная комбинация последнего столбца GlobalOrigin работает некорректно
+            // в произвдении матриц, приходится вручную брать метод OfPoint и переписывать данный столбец дополнитльным действием. В debug-е GlobalBasisX, GlobalBasisY, GlobalBasisZ
+            // можно рассматривать как матрицу 3х3, а строку GlobalOrigin представлять как столбец приписанный к этой матрице справа, 4 строка заполняется нулями, в месте (4;4) стоит единица
             Transform inverse = localCoordinateSystem.Inverse; //Получение обратной матрицы
 
             Transform inGlobal = instance.GetTotalTransform(); //У instance нельзя создать экземпляр - это небольшая проблемка
             Transform inLocal = inGlobal * inverse;
-            inLocal.Origin = inverse.OfPoint(inGlobal.Origin);
-            return null; //заглушка
+            inLocal.Origin = inverse.OfPoint(inGlobal.Origin); //данное доп действие нужно делать вне метода
+            return inLocal; //заглушка
         }
         public static Line FromLocalToGlobal(Transform localCoordinateSystem, Line foundation)
         {
@@ -95,9 +95,9 @@ namespace LocalBasis.Model
         }
         public static Instance FromLocalToGlobal(Transform localCoordinateSystem, Instance instance)
         {
-            // Так как Revit матрица считается кватрнионной и работает в R^4, а размерность локального базиса R^3, то линейная комбинация последнего столбца Origin работает некорректно
-            // в произвдении матриц, приходится вручную брать метод OfPoint и переписывать данный столбец дополнитльным действием. В debug-е BasisX, BasisY, BasisZ
-            // можно рассматривать как матрицу 3х3, а строку Origin представлять как столбец приписанный к этой матрице справа, 4 строка заполняется нулями, в месте (4;4) стоит единица
+            // Так как Revit матрица считается кватрнионной и работает в R^4, а размерность локального базиса R^3, то линейная комбинация последнего столбца GlobalOrigin работает некорректно
+            // в произвдении матриц, приходится вручную брать метод OfPoint и переписывать данный столбец дополнитльным действием. В debug-е GlobalBasisX, GlobalBasisY, GlobalBasisZ
+            // можно рассматривать как матрицу 3х3, а строку GlobalOrigin представлять как столбец приписанный к этой матрице справа, 4 строка заполняется нулями, в месте (4;4) стоит единица
 
 
             //Экземпляр instance всё та же проблемка

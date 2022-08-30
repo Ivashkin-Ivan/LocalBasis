@@ -5,8 +5,9 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:LocalBasis.View"
              mc:Ignorable="d" 
-             Height="300" Width="500" ResizeMode="NoResize">
+             Height="400" Width="600" ResizeMode="NoResize">
     <Grid>
+        <Grid/>
         <TextBlock Text=" Для получения координат элемента нажмите Track:"
                    Background="LightGoldenrodYellow" Margin="10,10,100,256"/>
         <Button x:Name="BTN_Save" 

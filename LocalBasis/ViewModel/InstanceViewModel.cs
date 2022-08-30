@@ -9,5 +9,7 @@ namespace LocalBasis.ViewModel
     public class InstanceViewModel
     {
 
+
+
     }
 }

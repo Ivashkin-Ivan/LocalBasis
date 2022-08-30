@@ -16,7 +16,7 @@ using LocalBasis.ViewModel;
 namespace LocalBasis.ExternalCommand
 {
     [TransactionAttribute(TransactionMode.Manual)]
-    internal class Command : IExternalCommand
+    internal class RevitCommand : IExternalCommand
     {
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
@@ -185,9 +185,6 @@ namespace LocalBasis.ExternalCommand
 
                 var vm = new InstanceViewModel();                
                 vm.CustomInstance = model;
-                vm.GlobalText = model.GlobalText;
-                vm.LocalText = model.LocalText;
-
                 var ui = new InstanceView();
                 ui.DataContext = vm;
                 ui.ShowDialog();

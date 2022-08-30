@@ -60,7 +60,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Command\TrackCommand.cs" />
-    <Compile Include="ExternalCommand\Command.cs" />
+    <Compile Include="ExternalCommand\RevitCommand.cs" />
     <Compile Include="Model\CustomInstance.cs" />
     <Compile Include="Model\CustomLine.cs" />
     <Compile Include="Model\MathCore.cs" />

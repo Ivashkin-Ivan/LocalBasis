@@ -14,11 +14,10 @@ namespace LocalBasis.ViewModel
     {
         private string globalText;
         private string localText;
-        public TrackCommand TrackCommand;
+        public TrackCommand trackCommand { get; set; }
         public CustomInstance CustomInstance;
 
         public event PropertyChangedEventHandler PropertyChanged;
-
         public string GlobalText
         {
             get
@@ -43,10 +42,9 @@ namespace LocalBasis.ViewModel
                OnPropertyChanged("LocalText");
             }
         }
-
         public InstanceViewModel()
         {
-            TrackCommand = new TrackCommand(this);
+            trackCommand = new TrackCommand(this);
         }
 
 

@@ -5,21 +5,20 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:LocalBasis.ViewModel"
              mc:Ignorable="d" 
-             Height="400" Width="600" >
+             Height="400" Width="600" ResizeMode="NoResize">
     <Window.DataContext>
         <local:InstanceViewModel/>
     </Window.DataContext>
     <Grid>
-        <Grid/>
         <TextBlock Text=" Для получения координат элемента нажмите Track:"
                    Background="LightGoldenrodYellow" Margin="10,10,100,256"/>
-        <Button x:Name="Track" 
+        <Button x:Name="BTN_Save" 
                 VerticalAlignment="Top" 
                 HorizontalAlignment="Right"
                 Content="Track" 
                 Margin="0,8,25,0" 
                 Width="65"
-                Command="{Binding TrackCommand}"/>
+                Command="{Binding trackCommand}"/>
         <TextBlock x:Name="Global"
                     Margin="10,33,25,142"  
                     Padding="10,10,10,10"

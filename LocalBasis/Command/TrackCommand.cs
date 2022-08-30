@@ -1,4 +1,5 @@
-﻿using LocalBasis.ViewModel;
+﻿using LocalBasis.Model;
+using LocalBasis.ViewModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,10 +14,10 @@ namespace LocalBasis.Command
     {
         public event EventHandler CanExecuteChanged;
 
-        private InstanceViewModel InstanceViewModel;
-        public TrackCommand(InstanceViewModel instanceViewModel) //пока сделаем только от инстанца
+        private InstanceViewModel ViewModel;
+        public TrackCommand(InstanceViewModel vm) //пока сделаем только от инстанца
         {
-            InstanceViewModel = instanceViewModel;
+            ViewModel = vm;
         }
         public bool CanExecute(object parameter)
         {
@@ -24,8 +25,8 @@ namespace LocalBasis.Command
         }
         public void Execute(object parameter)
         {
-            InstanceViewModel.CustomInstance.SetNewGlobalCoords();
-            InstanceViewModel.CustomInstance.SetNewLocalCoords();
+            ViewModel.CustomInstance.SetNewGlobalCoords();
+            ViewModel.GlobalText = ViewModel.CustomInstance.GlobalText;
             return;
         }
     }

@@ -1,21 +1,38 @@
 ﻿using Autodesk.Revit.DB;
+using LocalBasis.Command;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 
 namespace LocalBasis.Model
 {
-    public class CustomInstance
+    public class CustomInstance : INotifyPropertyChanged
     {
+        public TrackCommand trackCommand { get; set; }
         public Element Element { get; set; }
         public Instance Instance { get; set; }
 
         //Глобальная система координат это внутренее начало Revit
-        
+
         //GlobalCoords
         public XYZ GlobalBasisX { get; set; }
         public XYZ GlobalBasisY { get; set; }
         public XYZ GlobalBasisZ { get; set; }
         public XYZ GlobalOrigin { get; set; }
         //Для вывода
-        public string GlobalText = "привет";
+        private string globalText = "привет";
+        public string GlobalText
+        {
+            get
+            {
+                return globalText;
+            }
+            set
+            {
+                globalText = value;
+                OnPropertyChanged("GlobalText");
+            }
+        }
+        public int i = 0;
 
         //Локальная система координат
         public Transform LocalCoordinateSystem { get; set; }
@@ -26,16 +43,17 @@ namespace LocalBasis.Model
         public XYZ LocalBasisZ { get; set; }
         public XYZ LocalOrigin { get; set; }
         //Для вывода
+
         public string LocalText;
 
+        public event PropertyChangedEventHandler PropertyChanged;
         public CustomInstance(Element element, Transform localSystem)
         {
             Element = element;
             Instance = Element as Instance;
             LocalCoordinateSystem = localSystem;
             SetNewGlobalCoords();
-            SetNewLocalCoords();
-           
+            SetNewLocalCoords();   
         }
         public void SetNewGlobalCoords()
         {
@@ -44,11 +62,8 @@ namespace LocalBasis.Model
             GlobalBasisY = transform.BasisY;
             GlobalBasisZ = transform.BasisZ;
             GlobalOrigin = transform.Origin;
-            if (GlobalText == "привет")
-                GlobalText = "пока";
-            if (GlobalText == "пока")
-                GlobalText = "привет";
-
+            i++;
+            GlobalText = i.ToString();
         }
         public void SetNewLocalCoords()
         {
@@ -57,6 +72,11 @@ namespace LocalBasis.Model
             LocalBasisY = inLocal.BasisY;
             LocalBasisZ = inLocal.BasisZ;
             LocalOrigin = inLocal.Origin;
+        }
+        public void OnPropertyChanged([CallerMemberName] string prop = "")
+        {
+            if (PropertyChanged != null)
+                PropertyChanged(this, new PropertyChangedEventArgs(prop));
         }
     }
 }

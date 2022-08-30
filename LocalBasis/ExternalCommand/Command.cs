@@ -169,20 +169,21 @@ namespace LocalBasis.ExternalCommand
 
                 #endregion
 
-                //Test MathCore
 
-                //var foundation = (duct.Location as LocationCurve).Curve as Line;
 
-                //var newCoord = MathCore.CreateLocalCoordinateSystem(foundation, doc);
+
+                //Создадим систему на основе красного куба
+                var elementForCoord = doc.GetElement(new ElementId(286188));
+                var instanceForCoord = elementForCoord as Instance;
+                var localSystem = MathCore.CreateLocalCoordinateSystem(instanceForCoord, doc);
 
 
                 var element = doc.GetElement(new ElementId(288349)); //Элемент который будет трэкать
-                var model = new CustomInstance(element);
-
-
-
-                var vm = new InstanceViewModel();
+                var model = new CustomInstance(element, localSystem);
                 
+
+
+                var vm = new InstanceViewModel();                
                 vm.CustomInstance = model;
                 vm.GlobalText = model.GlobalText;
                 vm.LocalText = model.LocalText;
@@ -190,20 +191,6 @@ namespace LocalBasis.ExternalCommand
                 var ui = new InstanceView();
                 ui.DataContext = vm;
                     ui.Show();
-
-                
-
-
-
-
-
-              
-
-
-
-
-
-
 
 
 

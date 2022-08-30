@@ -46,9 +46,6 @@ namespace LocalBasis.ViewModel
 
         public InstanceViewModel()
         {
-            /*GlobalText = customInstance.GlobalText;
-            LocalText = customInstance.LocalText;
-            CustomInstance = customInstance;*/
             TrackCommand = new TrackCommand(this);
         }
 

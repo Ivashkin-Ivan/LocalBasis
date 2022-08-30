@@ -28,12 +28,14 @@ namespace LocalBasis.Model
         //Для вывода
         public string LocalText;
 
-        public CustomInstance(Element element)
+        public CustomInstance(Element element, Transform localSystem)
         {
             Element = element;
-            Instance = (Element as Instance);
+            Instance = Element as Instance;
+            LocalCoordinateSystem = localSystem;
             SetNewGlobalCoords();
             SetNewLocalCoords();
+           
         }
         public void SetNewGlobalCoords()
         {

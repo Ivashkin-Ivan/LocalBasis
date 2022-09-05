@@ -178,7 +178,7 @@ namespace LocalBasis.ExternalCommand
 
                 //=====================================================
                 //логика эталонного случая в методе
-                List<FamilyInstance> MakeSituation(Element wall)
+                List<FamilyInstance> MakeSituation(Element wall, Transform system)
                 {
                     var listFamilyInstance = new List<FamilyInstance>();
                     var wallLine = (wall.Location as LocationCurve).Curve as Line;
@@ -194,23 +194,27 @@ namespace LocalBasis.ExternalCommand
                                                                              .OfCategory(BuiltInCategory.OST_GenericModel)
                                                                              .Cast<FamilySymbol>()
                                                                              .First(it => it.FamilyName == "RedCube" && it.Name == "Красный");
+                             
+                             var locationinGlobal = system.OfPoint(familyLocation);  
                              if (!familySymbol.IsActive)
                              {
                                  familySymbol.Activate();
                              }
-                             var fi = _doc.Create.NewFamilyInstance(familyLocation, familySymbol, level, Autodesk.Revit.DB.Structure.StructuralType.NonStructural);
-                             var axis = Line.CreateUnbound(familyLocation, new XYZ(
-                                                                                   familyLocation.X,
-                                                                                   familyLocation.Y,
-                                                                                   familyLocation.Z + 1
+
+                             var fi = _doc.Create.NewFamilyInstance(locationinGlobal, familySymbol, level, Autodesk.Revit.DB.Structure.StructuralType.NonStructural);
+                             var axis = Line.CreateUnbound(locationinGlobal, new XYZ(
+                                                                                   locationinGlobal.X,
+                                                                                   locationinGlobal.Y,
+                                                                                   locationinGlobal.Z + 1
                                                                                   ));
                              ElementTransformUtils.RotateElement(_doc,fi.Id,axis,Math.PI/4);
                              listId.Add(fi.Id);
+                             listFamilyInstance.Add(fi);
                          }
-                         for(double z = 0; z < height; z += 4)
+                         /*for(double z = 0; z < height; z += 4)
                          { 
                             ElementTransformUtils.CopyElements(_doc, listId, new XYZ(0,0,z));
-                         }
+                         }*/
                      
                     return listFamilyInstance;
                 }
@@ -219,9 +223,11 @@ namespace LocalBasis.ExternalCommand
 
                 foreach(var pair in dict)
                 {
-                    var listfi = MakeSituation(pair.Key);
-                    // пересчёт элемента в местную систему
-                    // вызов метода логики эталонного случая (возвращает List FamilyInstance)
+                    
+                    
+                    var listfi = MakeSituation(pair.Key, pair.Value); //сюда подавать в нужной системе координат
+                    
+                   
 
                     //пересчёт координат для листа фэмили инстанц
                     //создание фэмили инстанц

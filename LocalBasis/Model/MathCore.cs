@@ -14,10 +14,24 @@ namespace LocalBasis.Model
             // Получим из отрезка начало(конец) и направляющий вектор
             XYZ vector = foundation.Direction;
             XYZ origin = foundation.Origin;
-            FamilyInstance cube = new FilteredElementCollector(document) //Нужно создвать экземпляр куба => нужно добавить проверку isActivate
+            //====================================//Создам экземпляр куба
+            Level level = new  FilteredElementCollector(document).OfClass(typeof(Level)).FirstElement() as Level;
+            FamilySymbol cubeSymbol = new FilteredElementCollector(document).OfClass(typeof(FamilySymbol))
+                                                                        .OfCategory(BuiltInCategory.OST_GenericModel)
+                                                                        .Cast<FamilySymbol>()
+                                                                        .First(it => it.FamilyName == "Система координат");
+            XYZ cubeLocation = XYZ.Zero;
+            if (!cubeSymbol.IsActive)
+            {
+                cubeSymbol.Activate();
+            }
+             document.Create.NewFamilyInstance(cubeLocation, cubeSymbol, level, Autodesk.Revit.DB.Structure.StructuralType.NonStructural);
+            //====================================
+           /* FamilyInstance cube = new FilteredElementCollector(document) //Нужно создвать экземпляр куба => нужно добавить проверку isActivate
                                       .OfClass(typeof(FamilyInstance))
                                       .Cast<FamilyInstance>()
-                                      .Last(it => it.Symbol.FamilyName == "RedCube" && it.Symbol.Name == "Красный");
+                                      .Last(it => it.Symbol.FamilyName == "RedCube" && it.Symbol.Name == "Красный");*/
+           
            
             XYZ facingOrientation = cube.FacingOrientation;
             double angle;

@@ -40,11 +40,6 @@ namespace LocalBasis.ExternalCommand
 
 
 
-
-
-
-
-
                 #region
 
                 // Очень важный код, разработака пересчёта Basis-а + тестовый id из документа стены
@@ -168,10 +163,12 @@ namespace LocalBasis.ExternalCommand
                     */
 
                 #endregion
+                //Для SampleApp
 
 
 
 
+                //Для трэкера
                 //Создадим систему на основе красного куба
                 var elementForCoord = doc.GetElement(new ElementId(286188));
                 var instanceForCoord = elementForCoord as Instance;

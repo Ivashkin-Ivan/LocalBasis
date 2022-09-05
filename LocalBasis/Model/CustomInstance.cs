@@ -65,7 +65,8 @@ namespace LocalBasis.Model
         }
         public void SetNewLocalCoords()
         {
-            Transform inLocal = MathCore.FromGlobalToLocal(LocalCoordinateSystem, Instance); //в идеале вернуть instance, стоит это сделать через создание семейства
+            var mc = new MathCore();
+            Transform inLocal = mc.FromGlobalToLocal(LocalCoordinateSystem, Instance); //в идеале вернуть instance, стоит это сделать через создание семейства
             LocalBasisX = inLocal.BasisX;
             LocalBasisY = inLocal.BasisY;
             LocalBasisZ = inLocal.BasisZ;

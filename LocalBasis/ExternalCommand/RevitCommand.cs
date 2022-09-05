@@ -12,17 +12,17 @@ using Autodesk.Revit.UI;
 using LocalBasis.Model;
 using LocalBasis.View;
 using LocalBasis.ViewModel;
-
 namespace LocalBasis.ExternalCommand
 {
     [TransactionAttribute(TransactionMode.Manual)]
     internal class RevitCommand : IExternalCommand
     {
+        private Document _doc;
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
 
             var doc = commandData.Application.ActiveUIDocument.Document;
-
+            _doc = doc;
             using (Transaction transaction = new Transaction(doc))
             {
                 transaction.Start("Safety transaction");
@@ -164,15 +164,81 @@ namespace LocalBasis.ExternalCommand
 
                 #endregion
                 //Для SampleApp
+                var list = new List<Element>();
+                var dict = new Dictionary<Element, Transform>();
+                list = new FilteredElementCollector(doc).OfClass(typeof(Wall)).ToElements().ToList();
+                foreach(var e in list)
+                {
+                    var mc = new MathCore();
+                    var found = (e.Location as LocationCurve).Curve as Line;
+                    var system = mc.CreateLocalCoordinateSystem(found, doc);
+                    dict.Add(e,system);
+                }
+                //Теперь мы имеет словарь с вектором и местной системой
 
+                //=====================================================
+                //логика эталонного случая в методе
+                List<FamilyInstance> MakeSituation(Element wall)
+                {
+                    var listFamilyInstance = new List<FamilyInstance>();
+                    var wallLine = (wall.Location as LocationCurve).Curve as Line;
+                    var level = _doc.GetElement(wall.LevelId) as Level;
+
+                    var listId = new List<ElementId>();
+                    var height = wall.LookupParameter("Неприсоединенная высота").AsDouble();
+                  
+                        for(double y = 0; y < wallLine.ApproximateLength; y += 4)
+                         {
+                             XYZ familyLocation = new XYZ(8 * Math.Sin(0.2*y) + 10, y, 0);
+                             FamilySymbol familySymbol = new FilteredElementCollector(_doc).OfClass(typeof(FamilySymbol))
+                                                                             .OfCategory(BuiltInCategory.OST_GenericModel)
+                                                                             .Cast<FamilySymbol>()
+                                                                             .First(it => it.FamilyName == "RedCube" && it.Name == "Красный");
+                             if (!familySymbol.IsActive)
+                             {
+                                 familySymbol.Activate();
+                             }
+                             var fi = _doc.Create.NewFamilyInstance(familyLocation, familySymbol, level, Autodesk.Revit.DB.Structure.StructuralType.NonStructural);
+                             var axis = Line.CreateUnbound(familyLocation, new XYZ(
+                                                                                   familyLocation.X,
+                                                                                   familyLocation.Y,
+                                                                                   familyLocation.Z + 1
+                                                                                  ));
+                             ElementTransformUtils.RotateElement(_doc,fi.Id,axis,Math.PI/4);
+                             listId.Add(fi.Id);
+                         }
+                         for(double z = 0; z < height; z += 4)
+                         { 
+                            ElementTransformUtils.CopyElements(_doc, listId, new XYZ(0,0,z));
+                         }
+                     
+                    return listFamilyInstance;
+                }
+
+                //=====================================================
+
+                foreach(var pair in dict)
+                {
+                    var listfi = MakeSituation(pair.Key);
+                    // пересчёт элемента в местную систему
+                    // вызов метода логики эталонного случая (возвращает List FamilyInstance)
+
+                    //пересчёт координат для листа фэмили инстанц
+                    //создание фэмили инстанц
+                }
+
+
+
+                //var sa = new SampleApp(doc);
 
 
 
                 //Для трэкера
                 //Создадим систему на основе красного куба
-                var elementForCoord = doc.GetElement(new ElementId(286188));
+                /*var elementForCoord = doc.GetElement(new ElementId(286188));
                 var instanceForCoord = elementForCoord as Instance;
-                var localSystem = MathCore.CreateLocalCoordinateSystem(instanceForCoord, doc);
+                var mc2 = new MathCore();
+                var localSystem = mc2.CreateLocalCoordinateSystem(instanceForCoord, doc);
 
 
                 var element = doc.GetElement(new ElementId(288349)); //Элемент который будет трэкать
@@ -184,7 +250,7 @@ namespace LocalBasis.ExternalCommand
                 vm.CustomInstance = model;
                 var ui = new InstanceView();
                 ui.DataContext = vm;
-                ui.Show();
+                ui.Show();*/
 
 
 

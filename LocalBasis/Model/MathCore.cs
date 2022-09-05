@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace LocalBasis.Model
 {
-    public static class MathCore
+    public class MathCore
     {
-        public static Transform CreateLocalCoordinateSystem(Line foundation, Document document)
+        public Transform CreateLocalCoordinateSystem(Line foundation, Document document)
         {
             // Получим из отрезка начало(конец) и направляющий вектор
             XYZ vector = foundation.Direction;
@@ -25,7 +25,7 @@ namespace LocalBasis.Model
             {
                 cubeSymbol.Activate();
             }
-             document.Create.NewFamilyInstance(cubeLocation, cubeSymbol, level, Autodesk.Revit.DB.Structure.StructuralType.NonStructural);
+            var cube = document.Create.NewFamilyInstance(cubeLocation, cubeSymbol, level, Autodesk.Revit.DB.Structure.StructuralType.NonStructural);
             //====================================
            /* FamilyInstance cube = new FilteredElementCollector(document) //Нужно создвать экземпляр куба => нужно добавить проверку isActivate
                                       .OfClass(typeof(FamilyInstance))
@@ -60,16 +60,16 @@ namespace LocalBasis.Model
             Transform transform = instance.GetTotalTransform();       // Матрица
             Transform inverse = instance.GetTotalTransform().Inverse; //Обратная матрица - сохраняю эту строку для понятности
                                                                       //====================================================
-            document.Delete(cube.Id); //Система готова, куб больше не нужен
+            //document.Delete(cube.Id); //Система готова, куб больше не нужен
 
             return transform; //Хранит информацию о новой систме координат
         }
-        public static Transform CreateLocalCoordinateSystem(Instance instance, Document document)
+        public Transform CreateLocalCoordinateSystem(Instance instance, Document document)
         {
             Transform transform = instance.GetTotalTransform(); //Из instance можно сразу получить систему координат
             return transform; //Хранит информацию о новой систме координат
         }
-        public static Line FromGlobalToLocal(Transform localCoordinateSystem, Line foundation)
+        public Line FromGlobalToLocal(Transform localCoordinateSystem, Line foundation)
         {
             Transform inverse = localCoordinateSystem.Inverse; //Получение обратной матрицы
 
@@ -83,7 +83,7 @@ namespace LocalBasis.Model
 
             return line;
         }
-        public static Transform FromGlobalToLocal(Transform localCoordinateSystem, Instance instance) // Прийдётся возвращать трансформ
+        public Transform FromGlobalToLocal(Transform localCoordinateSystem, Instance instance) // Прийдётся возвращать трансформ
         {
             // Так как Revit матрица считается кватрнионной и работает в R^4, а размерность локального базиса R^3, то линейная комбинация последнего столбца GlobalOrigin работает некорректно
             // в произвдении матриц, приходится вручную брать метод OfPoint и переписывать данный столбец дополнитльным действием. В debug-е GlobalBasisX, GlobalBasisY, GlobalBasisZ
@@ -95,7 +95,7 @@ namespace LocalBasis.Model
             inLocal.Origin = inverse.OfPoint(inGlobal.Origin); //данное доп действие нужно делать вне метода
             return inLocal; //заглушка
         }
-        public static Line FromLocalToGlobal(Transform localCoordinateSystem, Line foundation)
+        public Line FromLocalToGlobal(Transform localCoordinateSystem, Line foundation)
         {
             XYZ direction = foundation.Direction; //Распаковка линии
             XYZ origin = foundation.Origin;       //Распаковка линии
@@ -107,7 +107,7 @@ namespace LocalBasis.Model
 
             return line;
         }
-        public static Instance FromLocalToGlobal(Transform localCoordinateSystem, Instance instance)
+        public Instance FromLocalToGlobal(Transform localCoordinateSystem, Instance instance)
         {
             // Так как Revit матрица считается кватрнионной и работает в R^4, а размерность локального базиса R^3, то линейная комбинация последнего столбца GlobalOrigin работает некорректно
             // в произвдении матриц, приходится вручную брать метод OfPoint и переписывать данный столбец дополнитльным действием. В debug-е GlobalBasisX, GlobalBasisY, GlobalBasisZ

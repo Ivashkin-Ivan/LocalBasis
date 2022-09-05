@@ -38,7 +38,8 @@ namespace LocalBasis.Model
         }
         public void SetNewLocalCoords()
         {
-            var line = MathCore.FromGlobalToLocal(LocalCoordinateSystem, Line); // мнимая линия, из которой нужно взять локальные координаты
+            var mc = new MathCore();
+            var line = mc.FromGlobalToLocal(LocalCoordinateSystem, Line); // мнимая линия, из которой нужно взять локальные координаты
             LocalDirection = line.Direction;
             LocalOrigin = line.Origin;
         }

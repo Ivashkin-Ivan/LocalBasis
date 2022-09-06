@@ -203,7 +203,7 @@ namespace LocalBasis.ExternalCommand
                         for (double y = 0; y < wallLine.ApproximateLength; y += 1)
                         {
                             XYZ checkPoint = new XYZ(0, y, z); //Точка, которая ползёт по стене;
-                            XYZ familyLocation = new XYZ(4 * Math.Sin(0.2 * y) + 5, y, z);
+                            XYZ familyLocation = new XYZ(4 * Math.Sin(0.2 * y) -5 5, y, z);
                             FamilySymbol familySymbol = new FilteredElementCollector(_doc).OfClass(typeof(FamilySymbol))
                                                                             .OfCategory(BuiltInCategory.OST_GenericModel)
                                                                             .Cast<FamilySymbol>()
@@ -237,8 +237,8 @@ namespace LocalBasis.ExternalCommand
                                     checkPoint.Z <= bb.Max.Z
                                     )
                                 {
-                                    listId.Remove(fi.Id);
-                                    _doc.Delete(fi.Id);
+                                    //listId.Remove(fi.Id);
+                                    //_doc.Delete(fi.Id);
                                 }
                             }
                             listFamilyInstance.Add(fi);

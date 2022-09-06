@@ -168,7 +168,8 @@ namespace LocalBasis.ExternalCommand
                 //Для SampleApp
                 var list = new List<Element>();
                 var dict = new Dictionary<Element, Transform>();
-                list = new FilteredElementCollector(doc).OfClass(typeof(Wall)).ToElements().ToList();
+                //var listTuple = new List<Tuple<Element, Transform, List<BoundingBoxXYZ()>>();
+>                list = new FilteredElementCollector(doc).OfClass(typeof(Wall)).ToElements().ToList();
                 foreach(var e in list)
                 {
                     var mc = new MathCore();
@@ -190,7 +191,7 @@ namespace LocalBasis.ExternalCommand
 
                 //=====================================================
                 //логика эталонного случая в методе
-                List<FamilyInstance> MakeSituation(Element wall, Transform system)
+                List<FamilyInstance> MakeSituation(Element wall, Transform system) //добавить лист BB окон относящихся к данной стене
                 {
                     var listFamilyInstance = new List<FamilyInstance>();
                     var wallLine = (wall.Location as LocationCurve).Curve as Line;
@@ -203,7 +204,7 @@ namespace LocalBasis.ExternalCommand
                         for (double y = 0; y < wallLine.ApproximateLength; y += 1)
                         {
                             XYZ checkPoint = new XYZ(0, y, z); //Точка, которая ползёт по стене;
-                            XYZ familyLocation = new XYZ(4 * Math.Sin(0.2 * y) -5 5, y, z);
+                            XYZ familyLocation = new XYZ(4 * Math.Sin(0.2 * y) - 5, y, z);
                             FamilySymbol familySymbol = new FilteredElementCollector(_doc).OfClass(typeof(FamilySymbol))
                                                                             .OfCategory(BuiltInCategory.OST_GenericModel)
                                                                             .Cast<FamilySymbol>()

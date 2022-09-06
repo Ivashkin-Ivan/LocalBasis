@@ -18,10 +18,12 @@ namespace LocalBasis.ExternalCommand
     internal class RevitCommand : IExternalCommand
     {
         private Document _doc;
+        private List<BoundingBoxXYZ> listBB { get; set; } = new List<BoundingBoxXYZ>();
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
 
             var doc = commandData.Application.ActiveUIDocument.Document;
+            var view = commandData.View;
             _doc = doc;
             using (Transaction transaction = new Transaction(doc))
             {
@@ -174,6 +176,16 @@ namespace LocalBasis.ExternalCommand
                     var system = mc.CreateLocalCoordinateSystem(found, doc);
                     dict.Add(e,system);
                 }
+                var windows = new FilteredElementCollector(doc)
+                   .WhereElementIsNotElementType()
+                   .OfCategory(BuiltInCategory.OST_Windows)
+                   .Cast<FamilyInstance>()
+                   .ToList();
+
+                foreach(var e in windows)
+                {
+                    listBB.Add(e.get_BoundingBox(view));
+                }
                 //Теперь мы имеет словарь с вектором и местной системой
 
                 //=====================================================
@@ -186,35 +198,53 @@ namespace LocalBasis.ExternalCommand
 
                     var listId = new List<ElementId>();
                     var height = wall.LookupParameter("Неприсоединенная высота").AsDouble();
-                  
-                        for(double y = 0; y < wallLine.ApproximateLength; y += 4)
-                         {
-                             XYZ familyLocation = new XYZ(8 * Math.Sin(0.2*y) + 10, y, 0);
-                             FamilySymbol familySymbol = new FilteredElementCollector(_doc).OfClass(typeof(FamilySymbol))
-                                                                             .OfCategory(BuiltInCategory.OST_GenericModel)
-                                                                             .Cast<FamilySymbol>()
-                                                                             .First(it => it.FamilyName == "RedCube" && it.Name == "Красный");
-                             
-                             var locationinGlobal = system.OfPoint(familyLocation);  
-                             if (!familySymbol.IsActive)
-                             {
-                                 familySymbol.Activate();
-                             }
+                    for (double z = 0; z < height; z += 1)
+                    {
+                        for (double y = 0; y < wallLine.ApproximateLength; y += 1)
+                        {
+                            XYZ checkPoint = new XYZ(0, y, z); //Точка, которая ползёт по стене;
+                            XYZ familyLocation = new XYZ(4 * Math.Sin(0.2 * y) + 5, y, z);
+                            FamilySymbol familySymbol = new FilteredElementCollector(_doc).OfClass(typeof(FamilySymbol))
+                                                                            .OfCategory(BuiltInCategory.OST_GenericModel)
+                                                                            .Cast<FamilySymbol>()
+                                                                            .First(it => it.FamilyName == "RedCube" && it.Name == "Красный");
 
-                             var fi = _doc.Create.NewFamilyInstance(locationinGlobal, familySymbol, level, Autodesk.Revit.DB.Structure.StructuralType.NonStructural);
-                             var axis = Line.CreateUnbound(locationinGlobal, new XYZ(
-                                                                                   locationinGlobal.X,
-                                                                                   locationinGlobal.Y,
-                                                                                   locationinGlobal.Z + 1
-                                                                                  ));
-                             ElementTransformUtils.RotateElement(_doc,fi.Id,axis,Math.PI/4);
-                             listId.Add(fi.Id);
-                             listFamilyInstance.Add(fi);
-                         }
-                         /*for(double z = 0; z < height; z += 4)
-                         { 
-                            ElementTransformUtils.CopyElements(_doc, listId, new XYZ(0,0,z));
-                         }*/
+                            var locationinGlobal = system.OfPoint(familyLocation);
+                            if (!familySymbol.IsActive)
+                            {
+                                familySymbol.Activate();
+                            }
+
+                            var fi = _doc.Create.NewFamilyInstance(locationinGlobal, familySymbol, level, Autodesk.Revit.DB.Structure.StructuralType.NonStructural);
+                            listId.Add(fi.Id);
+                            /*var axis = Line.CreateUnbound(locationinGlobal, new XYZ(
+                                                                                  locationinGlobal.X,
+                                                                                  locationinGlobal.Y,
+                                                                                  locationinGlobal.Z + 1
+                                                                                 ));*/
+                            //ElementTransformUtils.RotateElement(_doc,fi.Id,axis,Math.PI/4);
+
+                            foreach (var bb in listBB)
+                            {
+                                if (checkPoint.Y < bb.Min.Y)
+                                {
+                                    continue;
+                                }
+                                if (
+                                    checkPoint.Y >= bb.Min.Y &&
+                                    checkPoint.Y <= bb.Max.Y &&
+                                    checkPoint.Z >= bb.Min.Z &&
+                                    checkPoint.Z <= bb.Max.Z
+                                    )
+                                {
+                                    listId.Remove(fi.Id);
+                                    _doc.Delete(fi.Id);
+                                }
+                            }
+                            listFamilyInstance.Add(fi);
+
+                        }
+                    }
                      
                     return listFamilyInstance;
                 }

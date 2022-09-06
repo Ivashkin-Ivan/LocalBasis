@@ -1,6 +1,7 @@
 ﻿using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Mechanical;
+using Autodesk.Revit.DB.Plumbing;
 using Autodesk.Revit.ApplicationServices;
 using System;
 using System.Collections.Generic;
@@ -165,11 +166,16 @@ namespace LocalBasis.ExternalCommand
                     */
 
                 #endregion
-                //Для SampleApp
-                var list = new List<Element>();
+
+                //Логика про sin здания
+               
+                //Очень важный код ============================================
+                #region
+                
+                /*var list = new List<Element>();
                 var dict = new Dictionary<Element, Transform>();
                 //var listTuple = new List<Tuple<Element, Transform, List<BoundingBoxXYZ()>>();
->                list = new FilteredElementCollector(doc).OfClass(typeof(Wall)).ToElements().ToList();
+              list = new FilteredElementCollector(doc).OfClass(typeof(Wall)).ToElements().ToList();
                 foreach(var e in list)
                 {
                     var mc = new MathCore();
@@ -218,11 +224,11 @@ namespace LocalBasis.ExternalCommand
 
                             var fi = _doc.Create.NewFamilyInstance(locationinGlobal, familySymbol, level, Autodesk.Revit.DB.Structure.StructuralType.NonStructural);
                             listId.Add(fi.Id);
-                            /*var axis = Line.CreateUnbound(locationinGlobal, new XYZ(
+                            var axis = Line.CreateUnbound(locationinGlobal, new XYZ(
                                                                                   locationinGlobal.X,
                                                                                   locationinGlobal.Y,
                                                                                   locationinGlobal.Z + 1
-                                                                                 ));*/
+                                                                                 ));
                             //ElementTransformUtils.RotateElement(_doc,fi.Id,axis,Math.PI/4);
 
                             foreach (var bb in listBB)
@@ -262,11 +268,101 @@ namespace LocalBasis.ExternalCommand
 
                     //пересчёт координат для листа фэмили инстанц
                     //создание фэмили инстанц
+                }*/
+
+                #endregion 
+                //=============================================================
+
+
+                //Плагин хомуты================================================
+                var listPipe = new List<Element>();
+                var list = new List<Element>();
+                var dict = new Dictionary<Element, Transform>();
+                list = new FilteredElementCollector(doc).OfClass(typeof(Duct)).ToElements().ToList();
+                listPipe = new FilteredElementCollector(doc).OfClass(typeof(Pipe)).ToElements().ToList();
+                foreach (var e in listPipe)
+                {
+                    list.Add(e);
                 }
 
+                foreach(var e in list)
+                {
+                    var mc = new MathCore();
+                    var found = (e.Location as LocationCurve).Curve as Line;
+                    if (found.Direction.Z <= -1E-1 || found.Direction.Z >= 1E-1)
+                        continue;
+                    var system = mc.CreateLocalCoordinateSystem(found, doc);
+                    dict.Add(e,system);
+                }
+       
+                //Теперь мы имеет словарь с вектором и местной системой
 
+                //=====================================================
+                //логика эталонного случая в методе
+                List<FamilyInstance> MakeSituation(Element duct, Transform system) //добавить лист BB окон относящихся к данной стене
+                {
+                    var listFamilyInstance = new List<FamilyInstance>();
+                    var ductLine = (duct.Location as LocationCurve).Curve as Line;
+                    var level = _doc.GetElement(duct.LevelId) as Level;
 
-                //var sa = new SampleApp(doc);
+                    var listId = new List<ElementId>();
+                 
+                        for (double y = 0; y < ductLine.ApproximateLength; y += 2)
+                        {
+                            XYZ familyLocation = new XYZ(0, y, 0);
+                            FamilySymbol familySymbol = new FilteredElementCollector(_doc).OfClass(typeof(FamilySymbol))
+                                                                            .OfCategory(BuiltInCategory.OST_GenericModel)
+                                                                            .Cast<FamilySymbol>()
+                                                                            .First(it => it.FamilyName == "HILTI_s_Хомут_MPN-RC" && it.Name == "Хомут для воздуховодов MV-PI");
+
+                            var locationinGlobal = system.OfPoint(familyLocation);
+                            if (!familySymbol.IsActive)
+                            {
+                                familySymbol.Activate();
+                            }
+                            var fi = _doc.Create.NewFamilyInstance(locationinGlobal, familySymbol, level, Autodesk.Revit.DB.Structure.StructuralType.NonStructural);
+                            var axis = Line.CreateBound(locationinGlobal, new XYZ(
+                                                          locationinGlobal.X,
+                                                          locationinGlobal.Y,
+                                                          locationinGlobal.Z + 1
+                                                         ));
+                            var angle = system.BasisY.AngleTo(fi.FacingOrientation);
+                            ElementTransformUtils.RotateElement(_doc, fi.Id, axis, angle);
+                            double value = 1000;
+                            try
+                            {
+                                if (duct.LookupParameter("Внешний диаметр") != null)
+                                     value = duct.LookupParameter("Внешний диаметр").AsDouble();
+                                else if (duct.LookupParameter("Диаметр") != null)
+                                     value = duct.LookupParameter("Диаметр").AsDouble();
+                                fi.LookupParameter("ADSK_Размер_Диаметр").Set(value);
+                            }
+                            catch
+                            {
+                                
+                            }
+                            listId.Add(fi.Id);
+                            listFamilyInstance.Add(fi);
+
+                        } 
+                    return listFamilyInstance;
+                }
+
+                //=====================================================
+
+                foreach(var pair in dict)
+                {
+                    
+                    
+                    var listfi = MakeSituation(pair.Key, pair.Value); //сюда подавать в нужной системе координат
+                    
+                   
+
+                    //пересчёт координат для листа фэмили инстанц
+                    //создание фэмили инстанц
+                }
+
+                //=============================================================
 
 
 

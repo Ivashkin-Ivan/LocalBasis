@@ -60,7 +60,7 @@ namespace LocalBasis.Model
             Transform transform = instance.GetTotalTransform();       // Матрица
             Transform inverse = instance.GetTotalTransform().Inverse; //Обратная матрица - сохраняю эту строку для понятности
                                                                       //====================================================
-            //document.Delete(cube.Id); //Система готова, куб больше не нужен
+            document.Delete(cube.Id); //Система готова, куб больше не нужен
 
             return transform; //Хранит информацию о новой систме координат
         }

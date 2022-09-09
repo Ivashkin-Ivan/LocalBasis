@@ -19,11 +19,13 @@ namespace LocalBasis.ExternalCommand
     internal class RevitCommand : IExternalCommand
     {
         private Document _doc;
+        private Element _floor;
         private List<BoundingBoxXYZ> listBB { get; set; } = new List<BoundingBoxXYZ>();
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
 
             var doc = commandData.Application.ActiveUIDocument.Document;
+            _floor = doc.GetElement(new ElementId(2959904));
             var view = commandData.View;
             _doc = doc;
             using (Transaction transaction = new Transaction(doc))
@@ -315,7 +317,7 @@ namespace LocalBasis.ExternalCommand
                                                                             .Cast<FamilySymbol>()
                                                                             .First(it => it.FamilyName == "HILTI_s_Хомут_MPN-RC" && it.Name == "Хомут для воздуховодов MV-PI");
 
-                            var locationinGlobal = system.OfPoint(familyLocation);
+                            var locationinGlobal = system.OfPoint(familyLocation); //Домножил Location на S^(-1) для возврата в систему ревит
                             if (!familySymbol.IsActive)
                             {
                                 familySymbol.Activate();
@@ -326,7 +328,7 @@ namespace LocalBasis.ExternalCommand
                                                           locationinGlobal.Y,
                                                           locationinGlobal.Z + 1
                                                          ));
-                            var angle = system.BasisY.AngleTo(fi.FacingOrientation);
+                            var angle = system.BasisY.AngleTo(fi.FacingOrientation); //сооринтровал по местной системе координат без возврата
                             ElementTransformUtils.RotateElement(_doc, fi.Id, axis, angle);
                             double value = 1000;
                             try
@@ -336,6 +338,22 @@ namespace LocalBasis.ExternalCommand
                                 else if (duct.LookupParameter("Диаметр") != null)
                                      value = duct.LookupParameter("Диаметр").AsDouble();
                                 fi.LookupParameter("ADSK_Размер_Диаметр").Set(value);
+
+                                //Притягивание к перекрытию
+                                var bottomRef = HostObjectUtils.GetBottomFaces(_floor as Floor).First();
+                                var bottomFace = (Face)(_floor as Floor).GetGeometryObjectFromReference(bottomRef);
+                                var projectResult = bottomFace.Project(fi.get_BoundingBox(view).Max);
+                                if (projectResult != null)
+                                {
+                                    var lenght = _floor.get_BoundingBox(view).Min.Z 
+                                        - (fi.Location as LocationPoint).Point.Z 
+                                        - fi.LookupParameter("ADSK_Размер_Диаметр").AsDouble() / 2;
+                                    fi.LookupParameter("Длина шпильки").Set(lenght);
+                                }
+                                else
+                                {
+                                    fi.LookupParameter("Длина шпильки").Set(2);
+                                }
                             }
                             catch
                             {

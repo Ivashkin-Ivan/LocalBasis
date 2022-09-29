@@ -20,14 +20,15 @@ namespace LocalBasis.ExternalCommand
     {
         private Document _doc;
         private Element _floor;
+        private Autodesk.Revit.DB.View _view;
         private List<BoundingBoxXYZ> listBB { get; set; } = new List<BoundingBoxXYZ>();
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
 
             var doc = commandData.Application.ActiveUIDocument.Document;
-            _floor = doc.GetElement(new ElementId(2959904));
-            var view = commandData.View;
+            var _view = commandData.View;
             _doc = doc;
+            _floor = new FilteredElementCollector(_doc).OfClass(typeof(Floor)).First();
             using (Transaction transaction = new Transaction(doc))
             {
                 transaction.Start("Safety transaction");
@@ -301,81 +302,13 @@ namespace LocalBasis.ExternalCommand
 
                 //=====================================================
                 //логика эталонного случая в методе
-                List<FamilyInstance> MakeSituation(Element duct, Transform system) //добавить лист BB окон относящихся к данной стене
-                {
-                    var listFamilyInstance = new List<FamilyInstance>();
-                    var ductLine = (duct.Location as LocationCurve).Curve as Line;
-                    var level = _doc.GetElement(duct.LevelId) as Level;
-
-                    var listId = new List<ElementId>();
-                 
-                        for (double y = 0; y < ductLine.ApproximateLength; y += 2)
-                        {
-                            XYZ familyLocation = new XYZ(0, y, 0);
-                            FamilySymbol familySymbol = new FilteredElementCollector(_doc).OfClass(typeof(FamilySymbol))
-                                                                            .OfCategory(BuiltInCategory.OST_GenericModel)
-                                                                            .Cast<FamilySymbol>()
-                                                                            .First(it => it.FamilyName == "HILTI_s_Хомут_MPN-RC" && it.Name == "Хомут для воздуховодов MV-PI");
-
-                            var locationinGlobal = system.OfPoint(familyLocation); //Домножил Location на S^(-1) для возврата в систему ревит
-                            if (!familySymbol.IsActive)
-                            {
-                                familySymbol.Activate();
-                            }
-                            var fi = _doc.Create.NewFamilyInstance(locationinGlobal, familySymbol, level, Autodesk.Revit.DB.Structure.StructuralType.NonStructural);
-                            var axis = Line.CreateBound(locationinGlobal, new XYZ(
-                                                          locationinGlobal.X,
-                                                          locationinGlobal.Y,
-                                                          locationinGlobal.Z + 1
-                                                         ));
-                            var angle = system.BasisY.AngleTo(fi.FacingOrientation); //сооринтровал по местной системе координат без возврата
-                            ElementTransformUtils.RotateElement(_doc, fi.Id, axis, angle);
-                            double value = 1000;
-                            try
-                            {
-                                if (duct.LookupParameter("Внешний диаметр") != null)
-                                     value = duct.LookupParameter("Внешний диаметр").AsDouble();
-                                else if (duct.LookupParameter("Диаметр") != null)
-                                     value = duct.LookupParameter("Диаметр").AsDouble();
-                                fi.LookupParameter("ADSK_Размер_Диаметр").Set(value);
-
-                                //Притягивание к перекрытию
-                                var bottomRef = HostObjectUtils.GetBottomFaces(_floor as Floor).First();
-                                var bottomFace = (Face)(_floor as Floor).GetGeometryObjectFromReference(bottomRef);
-                                var projectResult = bottomFace.Project(fi.get_BoundingBox(view).Max);
-                                if (projectResult != null)
-                                {
-                                    var lenght = _floor.get_BoundingBox(view).Min.Z 
-                                        - (fi.Location as LocationPoint).Point.Z 
-                                        - fi.LookupParameter("ADSK_Размер_Диаметр").AsDouble() / 2;
-                                    fi.LookupParameter("Длина шпильки").Set(lenght);
-                                }
-                                else
-                                {
-                                    fi.LookupParameter("Длина шпильки").Set(2);
-                                }
-                            }
-                            catch
-                            {
-                                
-                            }
-                            listId.Add(fi.Id);
-                            listFamilyInstance.Add(fi);
-
-                        } 
-                    return listFamilyInstance;
-                }
+               
 
                 //=====================================================
 
                 foreach(var pair in dict)
-                {
-                    
-                    
+                {                       
                     var listfi = MakeSituation(pair.Key, pair.Value); //сюда подавать в нужной системе координат
-                    
-                   
-
                     //пересчёт координат для листа фэмили инстанц
                     //создание фэмили инстанц
                 }
@@ -412,6 +345,69 @@ namespace LocalBasis.ExternalCommand
 
             return Result.Succeeded;
 
+        }
+        List<FamilyInstance> MakeSituation(Element duct, Transform system)
+        {
+            var listFamilyInstance = new List<FamilyInstance>();
+            var ductLine = (duct.Location as LocationCurve).Curve as Line;
+            var level = _doc.GetElement(duct.LevelId) as Level;
+
+            var listId = new List<ElementId>();
+            if (duct.LookupParameter("Внешний диаметр") != null)
+            {
+                return null;
+            }
+            for (double y = 0; y < ductLine.ApproximateLength; y += 2)
+            {
+                XYZ familyLocation = new XYZ(0, y, 0);
+                FamilySymbol familySymbol = new FilteredElementCollector(_doc).OfClass(typeof(FamilySymbol))
+                                                                .OfCategory(BuiltInCategory.OST_GenericModel)
+                                                                .Cast<FamilySymbol>()
+                                                                .First(it => it.FamilyName == "HILTI_s_Хомут_MPN-RC" && it.Name == "Хомут для воздуховодов MV-PI");
+                var locationinGlobal = system.OfPoint(familyLocation); //Домножил Location на S^(-1) для возврата в систему ревит
+                if (!familySymbol.IsActive)
+                {
+                    familySymbol.Activate();
+                }
+                var fi = _doc.Create.NewFamilyInstance(locationinGlobal, familySymbol, level, Autodesk.Revit.DB.Structure.StructuralType.NonStructural);
+                var axis = Line.CreateBound(locationinGlobal, new XYZ(
+                                              locationinGlobal.X,
+                                              locationinGlobal.Y,
+                                              locationinGlobal.Z + 1
+                                             ));
+                var angle = system.BasisY.AngleTo(fi.FacingOrientation); //сооринтровал по местной системе координат без возврата
+                ElementTransformUtils.RotateElement(_doc, fi.Id, axis, angle);
+                double value = 1000;
+                try
+                {
+                    if (duct.LookupParameter("Внешний диаметр") != null)
+                        value = duct.LookupParameter("Внешний диаметр").AsDouble();
+                    else if (duct.LookupParameter("Диаметр") != null)
+                        value = duct.LookupParameter("Диаметр").AsDouble();
+                    fi.LookupParameter("ADSK_Размер_Диаметр").Set(value);
+                    if (fi.LookupParameter("ADSK_Размер_Диаметр").AsDouble() > (800 / 304.8))
+                    {
+                        _doc.Delete(fi.Id);
+                    }
+                }
+                catch
+                {
+
+                }
+                //Притягивание к перекрытию
+                var bottomRef = HostObjectUtils.GetBottomFaces(_floor as Floor).First();
+                var bottomFace = (Face)(_floor as Floor).GetGeometryObjectFromReference(bottomRef);
+                var projectResult = bottomFace.Project(fi.get_BoundingBox(_view).Max);
+                if (projectResult != null)
+                {
+                    var lenght = _floor.get_BoundingBox(_view).Min.Z - (fi.Location as LocationPoint).Point.Z;
+                    fi.LookupParameter("Длина шпильки").Set(lenght);
+                }
+                listId.Add(fi.Id);
+                listFamilyInstance.Add(fi);
+
+            }
+            return listFamilyInstance;
         }
     }
 }

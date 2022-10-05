@@ -388,7 +388,9 @@ namespace LocalBasis.ExternalCommand
                 {
 
                 }
+
                 //Притягивание к перекрытию
+
                 var bottomRef = HostObjectUtils.GetBottomFaces(_floor as Floor).First();
                 var bottomFace = (Face)(_floor as Floor).GetGeometryObjectFromReference(bottomRef);
                 var projectResult = bottomFace.Project(fi.get_BoundingBox(_view).Max);

@@ -33,6 +33,10 @@ namespace LocalBasis.ExternalCommand
             {
                 transaction.Start("Safety transaction");
 
+
+                //Разобрать данный код позже
+                #region
+
                 //1) Имеется ревит с элементами,
                 //2) Размещаю куб (зашить isAcivae в MathCore)
                 //3) Выделяю элементы рамкой, ставлю ElementFilter, чтобы выбрал только asLine и asInstance
@@ -46,7 +50,7 @@ namespace LocalBasis.ExternalCommand
 
 
 
-                #region
+
 
                 // Очень важный код, разработака пересчёта Basis-а + тестовый id из документа стены
                 /*
@@ -168,13 +172,15 @@ namespace LocalBasis.ExternalCommand
 
                     */
 
-                #endregion
 
-                //Логика про sin здания
-               
+
+
+
                 //Очень важный код ============================================
-                #region
-                
+                //Логика про sin здания
+
+
+
                 /*var list = new List<Element>();
                 var dict = new Dictionary<Element, Transform>();
                 //var listTuple = new List<Tuple<Element, Transform, List<BoundingBoxXYZ()>>();
@@ -273,15 +279,16 @@ namespace LocalBasis.ExternalCommand
                     //создание фэмили инстанц
                 }*/
 
-                #endregion 
-                //=============================================================
+                #endregion
+                //==========================
 
 
-                //Плагин хомуты================================================
+                //Плагин хомуты
+
                 var listPipe = new List<Element>();
                 var list = new List<Element>();
                 var dict = new Dictionary<Element, Transform>();
-                list = new FilteredElementCollector(doc).OfClass(typeof(Duct)).ToElements().ToList();
+                list = new FilteredElementCollector(doc).OfClass(typeof(Duct)).ToElements().ToList();      // Лучше сделать через ElementFilter
                 listPipe = new FilteredElementCollector(doc).OfClass(typeof(Pipe)).ToElements().ToList();
                 foreach (var e in listPipe)
                 {
@@ -297,26 +304,16 @@ namespace LocalBasis.ExternalCommand
                     var system = mc.CreateLocalCoordinateSystem(found, doc);
                     dict.Add(e,system);
                 }
-       
+
                 //Теперь мы имеет словарь с вектором и местной системой
-
-                //=====================================================
-                //логика эталонного случая в методе
-               
-
-                //=====================================================
 
                 foreach(var pair in dict)
                 {                       
                     var listfi = MakeSituation(pair.Key, pair.Value); //сюда подавать в нужной системе координат
-                    //пересчёт координат для листа фэмили инстанц
-                    //создание фэмили инстанц
                 }
 
-                //=============================================================
-
-
-
+                //View and VM
+                #region
                 //Для трэкера
                 //Создадим систему на основе красного куба
                 /*var elementForCoord = doc.GetElement(new ElementId(286188));
@@ -335,17 +332,14 @@ namespace LocalBasis.ExternalCommand
                 var ui = new InstanceView();
                 ui.DataContext = vm;
                 ui.Show();*/
-
-
+                #endregion
 
                 transaction.Commit();
             }
-
-
-
             return Result.Succeeded;
-
         }
+
+        
         List<FamilyInstance> MakeSituation(Element duct, Transform system)
         {
             var listFamilyInstance = new List<FamilyInstance>();

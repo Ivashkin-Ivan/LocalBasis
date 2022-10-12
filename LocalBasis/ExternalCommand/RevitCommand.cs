@@ -285,14 +285,14 @@ namespace LocalBasis.ExternalCommand
             
                 //Плагин хомуты
                 //Зададим диапозоны по СП.73.13330.2016
-            var diapasons = new List<Diapason>()
-            {
-                new Diapason(15, 20, 3),
-                new Diapason(25, 32, 4),
-                new Diapason(40, 50, 5),
-                new Diapason(70, 100, 6),
-                new Diapason(125, 150, 8)
-            };
+                var diapasons = new List<Diapason>()
+                {
+                    new Diapason(15, 20, 3),
+                    new Diapason(25, 32, 4),
+                    new Diapason(40, 50, 5),
+                    new Diapason(70, 100, 6),
+                    new Diapason(125, 150, 8)
+                };
 
                 var listPipe = new List<Element>();
                 var list = new List<Element>();

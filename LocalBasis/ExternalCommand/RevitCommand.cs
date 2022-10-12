@@ -282,8 +282,17 @@ namespace LocalBasis.ExternalCommand
                 #endregion
                 //==========================
 
-
+            
                 //Плагин хомуты
+                //Зададим диапозоны по СП.73.13330.2016
+            var diapasons = new List<Diapason>()
+            {
+                new Diapason(15, 20, 3),
+                new Diapason(25, 32, 4),
+                new Diapason(40, 50, 5),
+                new Diapason(70, 100, 6),
+                new Diapason(125, 150, 8)
+            };
 
                 var listPipe = new List<Element>();
                 var list = new List<Element>();
@@ -379,7 +388,11 @@ namespace LocalBasis.ExternalCommand
                     else if (duct.LookupParameter("Диаметр") != null)
                         value = duct.LookupParameter("Диаметр").AsDouble();
                     fi.LookupParameter("ADSK_Размер_Диаметр").Set(value);
-                    if (fi.LookupParameter("ADSK_Размер_Диаметр").AsDouble() > (800 / 304.8))
+                    if(fi.Id.IntegerValue == 2958149)
+                    {
+
+                    }
+                    if (fi.LookupParameter("ADSK_Размер_Диаметр").AsDouble() > 1000)
                     {
                         _doc.Delete(fi.Id);
                     }
@@ -397,7 +410,7 @@ namespace LocalBasis.ExternalCommand
                 if (projectResult != null)
                 {
                     var lenght = _floor.get_BoundingBox(_view).Min.Z - (fi.Location as LocationPoint).Point.Z;
-                    fi.LookupParameter("Длина шпильки").Set(lenght);
+                    fi.LookupParameter("Расстояние от точки вставки до перекрытия").Set(lenght);
                 }
 
                 listId.Add(fi.Id);

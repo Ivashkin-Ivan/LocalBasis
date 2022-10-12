@@ -399,6 +399,7 @@ namespace LocalBasis.ExternalCommand
                     var lenght = _floor.get_BoundingBox(_view).Min.Z - (fi.Location as LocationPoint).Point.Z;
                     fi.LookupParameter("Длина шпильки").Set(lenght);
                 }
+
                 listId.Add(fi.Id);
                 listFamilyInstance.Add(fi);
 
